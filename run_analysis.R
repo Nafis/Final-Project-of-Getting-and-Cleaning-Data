@@ -91,4 +91,5 @@ library(dplyr)
  final.data<-data[,names(data)!="activity_label"]
  tidy.data<-aggregate(final.data[,names(final.data)!=c("id","activity")],by=list(id=final.data$id,Activity=final.data$activitiy),mean)
 
+#create a new data set and save it 
  write.table(tidy.data,file = "tidy_data.txt",row.names=TRUE,sep='\t')
