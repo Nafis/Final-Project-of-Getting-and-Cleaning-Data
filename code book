@@ -1,5 +1,5 @@
 Code book of fiding a tidy data for the Human Activity Recognition Using Smartphones Dataset###############################################################################
-
+(for more information about the variables refer to "README.txt" in this repository.
 First we have to download the dataset. This dataset is in .zip so after unziping the dataset we can acsses to the data
 We save it to our directry where we worked in, and it is easier to set the working directory on this while we work in R. by
  setwd("C:/Users/Pcs/Documents/R/galaxy/UCI HAR Dataset")
