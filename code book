@@ -1,4 +1,4 @@
-#Final projet of Getting and Cleaning data "Coursera"
+#Final projet of Getting and Cleaning data "Coursera"###############################################################################
 
 #Objectif:
 #1-Merges the training and the test sets to create one data set.
@@ -6,13 +6,13 @@
 #3-Uses descriptive activity names to name the activities in the data set
 #4-Appropriately labels the data set with descriptive variable names.
 #5-Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
+#####################################################################################################################################
 library(dplyr)
 
  # to set the directory on the location of the files
  setwd("C:/Users/Pcs/Documents/R/galaxy/UCI HAR Dataset")
  
-##Step 1
+#############################################   Step 1  #############################################################################
 
 ###merging the datasets("test and train") and merge them
 
@@ -29,35 +29,8 @@ library(dplyr)
  
  
  
- ##Reading the subjects of (test and train data) and combine them 
  
- #setwd("C:/Users/Pcs/Documents/R/galaxy/UCI HAR Dataset")
- testsubject<-read.table("test/subject_test.txt")
- trainsubject<-read.table("train/subject_train.txt")
- 
- #combining them
- merged.subjects<-rbind(trainsubject,testsubject)
- 
- #again deleting the extra files
- rm(trainsubject)
- rm(testsubject)
- 
- 
- 
- ####reading the activity's file:
- activity<-read.table("activity_labels.txt")
- #to view the activities: 
- # View(activity)
- 
- 
- 
- ###reading training and test lables and combining them
- test.lable<-read.table("test/y_test.txt")
- Train.lable<-read.table("train/y_train.txt")
- #merging them
- merged.lable<-rbind(test.lable,Train.lable)
- 
- 
+################################### Step 2 #####################################################################################
  
  #reading features file 
  features<-read.table("features.txt",stringsAsFactors = FALSE)
@@ -74,28 +47,48 @@ library(dplyr)
  #we don't need the paranthesis in the names ( forexample: mean()----->mean )
  names(wanted.data) <- gsub("\\)|\\(", "", names(wanted.data))
 
+ 
+######################################################## step 3 ############################################################ 
+ 
+ ####reading the activity's file:
+ activity.label<-read.table("activity_labels.txt",header=FALSE)
+ # to view the activities: 
+ # View(activity)
+ 
+ # readinf all data (about the activities) type and merge them
+ y_test<-read.table("test/y_test.txt",header = FALSE)
+ y_train<-read.table("train/y_train.txt",header = FALSE)
+ activities<-rbind(y_test,y_train)
+ 
+ # Now give them  lables
+ activities[,2]<-activity.label[activities[,1],2]
+ names(activities)<-c("activitiy_label","activitiy")  
 
  
+####################################### step 4 ######################################################################################## 
  
-###### last information
- #### merging the datasets("test and train") in signals and merge them
+ testsubject<-read.table("test/subject_test.txt")
+ trainsubject<-read.table("train/subject_train.txt")
  
- ##to have a list of all files in two sorts of data: 
-# datatrain<-list.files("galaxy/UCI HAR Dataset/train/Inertial Signals")
-# datatest<-list.files("galaxy/UCI HAR Dataset/test/Inertial Signals")
+ #combining them
+ id<-rbind(testsubject,trainsubject)
+ names(id)<-c("id")
  
+ #again deleting the extra variables
+ rm(trainsubject)
+ rm(testsubject)
  
-# #reading the datasets
+
+
+
+ # our data is near to be tidy now....
+ data<-cbind(id,activities,wanted.data)
  
-# setwd("galaxy/UCI HAR Dataset/train/Inertial Signals")
+##############################################  step 5   #####################################################################
+         
  
- #for(file in datatrain){
- #        alltrainfiles<-read.table(file,header = FALSE)
- #}
- 
- 
- #setwd("C:/Users/Pcs/Documents/R/galaxy/UCI HAR Dataset/test/Inertial Signals")
- 
-# for(file in datatest){
- #        alltestfiles<-read.table(file,header = FALSE)
- #}
+# final.data without "activity_label" column for calculation the mean of other columns
+ final.data<-data[,names(data)!="activity_label"]
+ tidy.data<-aggregate(final.data[,names(final.data)!=c("id","activity")],by=list(id=final.data$id,Activity=final.data$activitiy),mean)
+
+ write.table(tidy.data,file = "tidy_data.txt",row.names=TRUE,sep='\t')
