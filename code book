@@ -1,94 +1,41 @@
-#Final projet of Getting and Cleaning data "Coursera"###############################################################################
+Code book of fiding a tidy data for the Human Activity Recognition Using Smartphones Dataset###############################################################################
 
-#Objectif:
-#1-Merges the training and the test sets to create one data set.
-#2-Extracts only the measurements on the mean and standard deviation for each measurement.
-#3-Uses descriptive activity names to name the activities in the data set
-#4-Appropriately labels the data set with descriptive variable names.
-#5-Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-#####################################################################################################################################
-library(dplyr)
-
- # to set the directory on the location of the files
+First we have to download the dataset. This dataset is in .zip so after unziping the dataset we can acsses to the data
+We save it to our directry where we worked in, and it is easier to set the working directory on this while we work in R. by
  setwd("C:/Users/Pcs/Documents/R/galaxy/UCI HAR Dataset")
- 
-#############################################   Step 1  #############################################################################
 
-###merging the datasets("test and train") and merge them
+There are 5 steps that we have to follow to get to the tidy data according to the "Coursera final project" 
+ 
+###  Step 1  
 
- ## "X_train.txt" and "X_test.txt" are the "training" set and the "test set".
- alltestfiles<-read.table("test/X_test.txt")
- alltrainfiles<-read.table("train/X_train.txt")
- 
- #now merging them together
- merged.set<-rbind(alltestfiles,alltrainfiles)
- 
- #deleting the extra files
- rm(alltrainfiles)
- rm(alltestfiles)
- 
- 
- 
- 
-################################### Step 2 #####################################################################################
- 
- #reading features file 
- features<-read.table("features.txt",stringsAsFactors = FALSE)
+#Merges the training and the test sets to create one data set.
+So after reading the two sorts of data sets, we merged them together.
 
- #View(features)
- #we just need the names colomn
- features<-features$V2
+###  Step 2 
+ #Extracts only the measurements on the mean and standard deviation for each measurement.
+ So after reading the datas which are concerned to features,  we select just the variables which their names include two words:
+ "mean" and "std". after for making it more nicer we do some extra orders to have a huminy readable data.
+
+##  Step 3 
+ #Uses descriptive activity names to name the activities in the data set
  
- #keep just the variables that their names include "std" and "mean" but not includes "Frequency"
- wewantthem<-grep("(std|mean[^F])",features)
- wanted.data<-merged.set[,wewantthem]
- #naming the dataset
- names(wanted.data)<-features[wewantthem]
- #we don't need the paranthesis in the names ( forexample: mean()----->mean )
- names(wanted.data) <- gsub("\\)|\\(", "", names(wanted.data))
+ So we have to access to the activity files which is categorised in 6 different positions:
+1 WALKING
+2 WALKING_UPSTAIRS
+3 WALKING_DOWNSTAIRS
+4 SITTING
+5 STANDING
+6 LAYING
+
+ after we need to label every data in y_test and y_train and merge them at the end or vice versa
+ 
 
  
-######################################################## step 3 ############################################################ 
- 
- ####reading the activity's file:
- activity.label<-read.table("activity_labels.txt",header=FALSE)
- # to view the activities: 
- # View(activity)
- 
- # readinf all data (about the activities) type and merge them
- y_test<-read.table("test/y_test.txt",header = FALSE)
- y_train<-read.table("train/y_train.txt",header = FALSE)
- activities<-rbind(y_test,y_train)
- 
- # Now give them  lables
- activities[,2]<-activity.label[activities[,1],2]
- names(activities)<-c("activitiy_label","activitiy")  
-
- 
-####################################### step 4 ######################################################################################## 
- 
- testsubject<-read.table("test/subject_test.txt")
- trainsubject<-read.table("train/subject_train.txt")
- 
- #combining them
- id<-rbind(testsubject,trainsubject)
- names(id)<-c("id")
- 
- #again deleting the extra variables
- rm(trainsubject)
- rm(testsubject)
- 
+##step 4 
+# Appropriately labels the data set with descriptive variable names.
 
 
-
- # our data is near to be tidy now....
- data<-cbind(id,activities,wanted.data)
  
-##############################################  step 5   #####################################################################
+##  step 5 
          
- 
-# final.data without "activity_label" column for calculation the mean of other columns
- final.data<-data[,names(data)!="activity_label"]
- tidy.data<-aggregate(final.data[,names(final.data)!=c("id","activity")],by=list(id=final.data$id,Activity=final.data$activitiy),mean)
-
- write.table(tidy.data,file = "tidy_data.txt",row.names=TRUE,sep='\t')
+ #Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
